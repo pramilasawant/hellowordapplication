@@ -3,37 +3,33 @@ kind: Deployment
 metadata:
   name: springboot-k8s-deployment
 spec:
+  replicas: 2
   selector:
     matchLabels:
-    app: spring-boot-k8s
-    replicas: 2
-    template:
+      app: spring-boot-k8s
+  template:
     metadata:
       labels:
-        spec:
-        containers:
-         - name: spring-boot-k8s
-           image: pramila188/hellowordapplication
-           imagePullPolicy: IfNotPresent
-           ports:
-            - containerPort: 8070
-            
+        app: spring-boot-k8s
+    spec:
+      containers:
+      - name: spring-boot-k8s
+        image: hellowordapplication:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8070
+
 ---
-    
+
 apiVersion: v1
 kind: Service
 metadata:
   name: springboot-k8ssvc
-  spec:
-    selector:
-     app: spring-boot-k8s
-  ports: 
-    - protocol: "TCP"
-      port: 8070
-      targetport: 8070
-      type: NodePort
-      
-
-            
-            
-        
+spec:
+  selector:
+    app: spring-boot-k8s
+  ports:
+  - protocol: TCP
+    port: 8070
+    targetPort: 8070
+  type: NodePort
