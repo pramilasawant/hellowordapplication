@@ -17,7 +17,7 @@ spec:
         image: hellowordapplication:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8082
+        - containerPort: 8070
 
 ---
 
@@ -30,6 +30,6 @@ spec:
     app: spring-boot-k8s
   ports:
   - protocol: TCP
-    port: 8082
-    targetPort: 8082
+    port: 8070
+    targetPort: 8070
   type: NodePort
