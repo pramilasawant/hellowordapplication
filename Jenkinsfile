@@ -17,8 +17,10 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                dir('hellowordapplication') { // Change to the correct directory if needed
+                    sh 'mvn clean install'
             }
+        }
         }
         stage('SonarQube Analysis') {
             steps {
