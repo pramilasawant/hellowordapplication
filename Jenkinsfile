@@ -1,16 +1,18 @@
 pipeline {
     agent any
     tools {
-        maven 'maven'  // Use the correct Maven name from Jenkins
-        jdk 'JDK 11'      // Use the correct JDK name from Jenkins
+        maven 'maven'  // Use the correct Maven name from Jenkins Global Tool Configuration
+        jdk 'JDK 11'   // Use the correct JDK name from Jenkins Global Tool Configuration
     }
     environment {
-        SONARQUBE_SERVER = 'SonarQube'
+        SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
+        JAVA_HOME = "${tool 'JDK 11'}"  // Set JAVA_HOME
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
     }
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git url: 'https://github.com/pramilasawant/hellowordapplication.git', branch: 'main'
             }
         }
         stage('Build') {
@@ -20,7 +22,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('SonarQube') {  // 'SonarQube' matches the server name in Jenkins configuration
                     sh 'mvn sonar:sonar'
                 }
             }
