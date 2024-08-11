@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'sudo mvn clean install'
             }
         }
         stage('SonarQube Analysis') {
