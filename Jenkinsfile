@@ -6,9 +6,9 @@ pipeline {
     }
     environment {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
+        SONARQUBE_TOKEN = credentials('sonar-token')  // Use Jenkins credentials ID for the SonarQube token
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
-        SONAR_TOKEN = credentials('sonar_token')  // Use Jenkins credentials for the SonarQube token
     }
     stages {
         stage('Checkout') {
@@ -27,15 +27,8 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarQube_Scanner/bin/sonar-scanner \
-                            -Dsonar.projectKey=hellowordapplication \
-                            -Dsonar.sources=src \
-                            -Dsonar.java.binaries=target/classes \
-                            -Dsonar.login=${SONAR_TOKEN} \
-                            -X
-                    '''
+                withSonarQubeEnv(SONARQUBE_SERVER) {
+                    sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN}'
                 }
             }
         }
@@ -45,8 +38,8 @@ pipeline {
                 script {
                     def qualityGateStatus
                     try {
-                        // Use SonarQube API to check the quality gate status
-                        def response = sh(script: "curl -s -u ${SONAR_TOKEN}: \"${SONARQUBE_SERVER}/api/qualitygates/project_status?projectKey=hellowordapplication\"", returnStdout: true).trim()
+                        // Poll the SonarQube server to check the quality gate status
+                        def response = sh(script: "curl -s -u ${SONARQUBE_TOKEN}: \"${SONARQUBE_SERVER}/api/qualitygates/project_status?projectKey=hellowordapplication\"", returnStdout: true).trim()
                         def json = readJSON(text: response)
                         qualityGateStatus = json.projectStatus.status
                         if (qualityGateStatus != 'OK') {
