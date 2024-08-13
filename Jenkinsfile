@@ -8,7 +8,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
-        SONAR_TOKEN = credentials('sonar_token')  // Use Jenkins credentials for the SonarQube token
+        SONAR_TOKEN = credentials('sqp_ba2c99c74323e33f7a03de1cbd1d5b114ed9bdf2')  // Use Jenkins credentials for the SonarQube token
     }
     stages {
         stage('Checkout') {
