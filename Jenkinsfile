@@ -28,7 +28,9 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hellowordapplication -Dsonar.sources=src -Dsonar.java.binaries=target/classes"
+                    withCredentials([string(credentialsId: 'squ_1099b4d589be6d54f7282d51d46c2d417add0809', variable: 'SONAR_TOKEN')]) {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hellowordapplication -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.login=${SONAR_TOKEN}"
+                    }
                 }
             }
         }
@@ -56,3 +58,4 @@ pipeline {
         }
     }
 }
+
