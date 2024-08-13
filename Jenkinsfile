@@ -8,7 +8,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
-        SONAR_TOKEN = credentials('squ_1099b4d589be6d54f7282d51d46c2d417add0809')  // Add the SonarQube token
+        SONAR_TOKEN = 'sonar_token'  // Add the SonarQube token
     }
     stages {
         stage('Checkout') {
