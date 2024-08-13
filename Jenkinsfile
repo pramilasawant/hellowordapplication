@@ -44,7 +44,7 @@ pipeline {
                     return currentBuild.result == null || currentBuild.result == 'SUCCESS'
                 }
             }
-    }
+    
 
     post {
         success {
