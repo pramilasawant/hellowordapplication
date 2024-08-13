@@ -8,11 +8,17 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
+        SONAR_TOKEN = credentials('squ_1099b4d589be6d54f7282d51d46c2d417add0809')  // Add the SonarQube token
     }
     stages {
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/pramilasawant/hellowordapplication.git', branch: 'main'
+            }
+        }
+        stage('Cleanup') {
+            steps {
+                cleanWs()
             }
         }
         stage('Build') {
@@ -28,9 +34,7 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    withCredentials([string(credentialsId: 'squ_1099b4d589be6d54f7282d51d46c2d417add0809', variable: 'SONAR_TOKEN')]) {
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hellowordapplication -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.login=${SONAR_TOKEN}"
-                    }
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hellowordapplication -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.login=${SONAR_TOKEN} -X"
                 }
             }
         }
@@ -58,4 +62,3 @@ pipeline {
         }
     }
 }
-
