@@ -16,11 +16,7 @@ pipeline {
                 git url: 'https://github.com/pramilasawant/hellowordapplication.git', branch: 'main'
             }
         }
-        stage('Cleanup') {
-            steps {
-                cleanWs()
-            }
-        }
+        
         stage('Build') {
             steps {
                 dir('hellowordapplication/hellowordapplication') { // Change to the correct directory if needed
