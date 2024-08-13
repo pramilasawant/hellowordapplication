@@ -24,13 +24,17 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube Analysis') {
-            environment {
-                scannerHome = tool 'SonarQube Scanner'
-            }
+       stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=hellowordapplication -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.login=${SONAR_TOKEN} -X"
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarQube_Scanner/bin/sonar-scanner \
+                            -Dsonar.projectKey=hellowordapplication \
+                            -Dsonar.sources=src \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.login=${SONARQUBE_TOKEN} \
+                            -X
+                    '''
                 }
             }
         }
