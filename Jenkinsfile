@@ -19,7 +19,7 @@ pipeline {
         
         stage('Build') {
             steps {
-                dir('hellowordapplication/hellowordapplication') { // Change to the correct directory if needed
+                dir('hellowordapplication') { // Change to the correct directory if needed
                     sh 'mvn clean install'
                 }
             }
