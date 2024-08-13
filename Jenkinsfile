@@ -8,7 +8,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
-        SONAR_TOKEN = 'sonar_token'  // Add the SonarQube token
+        SONAR_TOKEN = credentials('sonar_token')  // Use Jenkins credentials for the SonarQube token
     }
     stages {
         stage('Checkout') {
@@ -24,7 +24,8 @@ pipeline {
                 }
             }
         }
-       stage('SonarQube Analysis') {
+        
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
@@ -32,20 +33,33 @@ pipeline {
                             -Dsonar.projectKey=hellowordapplication \
                             -Dsonar.sources=src \
                             -Dsonar.java.binaries=target/classes \
-                            -Dsonar.login=${SONARQUBE_TOKEN} \
+                            -Dsonar.login=${SONAR_TOKEN} \
                             -X
                     '''
                 }
             }
         }
-          stage('Quality Gate') {
-            when {
-                expression {
-                    return currentBuild.result == null || currentBuild.result == 'SUCCESS'
+        
+        stage('Quality Gate') {
+            steps {
+                script {
+                    def qualityGateStatus
+                    try {
+                        // Use SonarQube API to check the quality gate status
+                        def response = sh(script: "curl -s -u ${SONAR_TOKEN}: \"${SONARQUBE_SERVER}/api/qualitygates/project_status?projectKey=hellowordapplication\"", returnStdout: true).trim()
+                        def json = readJSON(text: response)
+                        qualityGateStatus = json.projectStatus.status
+                        if (qualityGateStatus != 'OK') {
+                            error "SonarQube Quality Gate failed: ${qualityGateStatus}"
+                        }
+                    } catch (Exception e) {
+                        error "Failed to check SonarQube Quality Gate status: ${e.getMessage()}"
+                    }
                 }
             }
+        }
+    }
     
-
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
