@@ -27,12 +27,13 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
+                dir('hellowordapplication'){
                 withSonarQubeEnv(SONARQUBE_SERVER) {
                     sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN}'
                 }
             }
         }
-        
+        }  
         stage('Quality Gate') {
             steps {
                 script {
