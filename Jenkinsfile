@@ -28,12 +28,21 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 dir('hellowordapplication'){
-                withSonarQubeEnv(SONARQUBE_SERVER) {
-                    sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN}'
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN}'
+                    }
                 }
             }
         }
+
+        stage('Test') {
+            steps {
+                dir('hellowordapplication'){ // Change to the correct directory if needed
+                    sh 'mvn test'
+                }
+            }
         }
+        
         stage('Quality Gate') {
             steps {
                 script {
