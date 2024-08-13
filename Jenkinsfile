@@ -28,19 +28,25 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 dir('hellowordapplication'){
-                withSonarQubeEnv(SONARQUBE_SERVER) {
-                    sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN}'
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        // Print SonarQube environment variables for debugging
+                        sh 'echo "SonarQube Server: ${SONAR_HOST_URL}"'
+                        sh 'echo "SonarQube Token: ${SONARQUBE_TOKEN}"'
+                        
+                        // Run SonarQube analysis
+                        sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -X'  // Add -X for full debug logging
+                    }
                 }
             }
         }
-        }
+
         stage('Quality Gate') {
             steps {
                 script {
                     def qualityGateStatus
                     try {
                         // Poll the SonarQube server to check the quality gate status
-                        def response = sh(script: "curl -s -u ${SONARQUBE_TOKEN}: \"${SONARQUBE_SERVER}/api/qualitygates/project_status?projectKey=hellowordapplication\"", returnStdout: true).trim()
+                        def response = sh(script: "curl -s -u ${SONARQUBE_TOKEN}: \"${SONARQUBE_SERVER}/api/qualitygates/project_status?projectKey=com.example:hellowordapplication\"", returnStdout: true).trim()
                         def json = readJSON(text: response)
                         qualityGateStatus = json.projectStatus.status
                         if (qualityGateStatus != 'OK') {
