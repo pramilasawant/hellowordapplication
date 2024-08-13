@@ -33,7 +33,7 @@ pipeline {
                 }
             }
         }
-         
+        }
         stage('Quality Gate') {
             steps {
                 script {
@@ -53,7 +53,7 @@ pipeline {
             }
         }
     }
-    }  
+     
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
