@@ -5,7 +5,7 @@ pipeline {
         jdk 'JDK 17'   // Use the correct JDK name from Jenkins Global Tool Configuration
     }
     environment {
-        SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
+        SONARQUBE_SERVER = 'Sonar'  // This should match the name given during the SonarQube server configuration
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
     }
