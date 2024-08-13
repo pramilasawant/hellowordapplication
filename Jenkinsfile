@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
-        SONARQUBE_TOKEN = credentials('sonar-token')  // Use Jenkins credentials ID for the SonarQube token
+        SONARQUBE_TOKEN = credentials('sonar_token')  // Use Jenkins credentials ID for the SonarQube token
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to PATH
     }
