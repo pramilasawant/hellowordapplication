@@ -55,4 +55,7 @@ pipeline {
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
-            slackSend(channel: '#your-channel', color: '
+            slackSend(channel: '#your-channel', color: 'danger', message: "Pipeline failed at stage: ${currentBuild.currentResult}")
+        }
+    }
+}
