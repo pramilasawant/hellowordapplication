@@ -29,10 +29,6 @@ pipeline {
             steps {
                 dir('hellowordapplication'){
                     withSonarQubeEnv(SONARQUBE_SERVER) {
-                        // Print SonarQube environment variables for debugging
-                        sh 'echo "SonarQube Server: ${SONAR_HOST_URL}"'
-                        sh 'echo "SonarQube Token: ${SONARQUBE_TOKEN}"'
-                        
                         // Run SonarQube analysis
                         sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -X'  // Add -X for full debug logging
                     }
@@ -63,6 +59,7 @@ pipeline {
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
+            slackSend(channel: '#your-channel', color: 'good', message: "Pipeline succeeded: ${currentBuild.currentResult}")
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
@@ -70,3 +67,4 @@ pipeline {
         }
     }
 }
+
