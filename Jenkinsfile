@@ -31,7 +31,7 @@ pipeline {
                     script {
                         withSonarQubeEnv(SONARQUBE_SERVER) { // Ensure this matches your SonarQube server name
                            withCredentials([string(credentialsId: 'sonar_token', variable: 'SONAR_TOKEN')]) {
-                             sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+                            mvn clean install sonar:sonar
 
                         }
                         }     
