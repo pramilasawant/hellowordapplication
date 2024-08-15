@@ -30,7 +30,7 @@ pipeline {
                 dir('hellowordapplication') {
                     script {
                         withSonarQubeEnv(SONARQUBE_SERVER) { // Ensure this matches your SonarQube server name
-                            sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -Dsonar.host.url=http://your-actual-sonarqube-server-url -Dsonar.projectKey=my-project-key -X'
+                            sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=sonarqube_integration"
                         }
                     }
                 }
