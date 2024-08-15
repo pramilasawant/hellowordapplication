@@ -30,9 +30,10 @@ pipeline {
                 dir('hellowordapplication') {
                     script {
                         withSonarQubeEnv(SONARQUBE_SERVER) { // Ensure this matches your SonarQube server name
-                            // Run your build tool with SonarQube Scanner
-                              sh 'mvn clean verify sonar:sonar'
+                           withCredentials([string(credentialsId: 'sonar_token', variable: 'SONAR_TOKEN')]) {
+                              sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                         }
+                        }     
                     }
                 }
             }
