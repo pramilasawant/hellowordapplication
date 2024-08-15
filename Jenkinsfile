@@ -27,10 +27,12 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    // Use the SonarQube Scanner plugin's built-in environment
-                    withSonarQubeEnv(SONARQUBE_SERVER) { // Replace 'SonarQube' with your SonarQube server name
-                        sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -Dsonar.host.url=http://your-sonarqube-server -Dsonar.projectKey=my-project-key'
+                dir('hellowordapplication') { // Ensure the analysis is run in the correct directory
+                    script {
+                        // Use the SonarQube Scanner plugin's built-in environment
+                        withSonarQubeEnv(SONARQUBE_SERVER) { // Replace 'SonarQube' with your SonarQube server name
+                            sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -Dsonar.host.url=http://your-sonarqube-server -Dsonar.projectKey=my-project-key'
+                        }
                     }
                 }
             }
