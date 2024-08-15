@@ -3,6 +3,7 @@ pipeline {
     tools {
         maven 'maven'  // Use the correct Maven name from Jenkins Global Tool Configuration
         jdk 'JDK 17'   // Use the correct JDK name from Jenkins Global Tool Configuration
+        sonar 'SonarQube Scanner' // Add the SonarQube Scanner tool
     }
     environment {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
@@ -27,10 +28,11 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                dir('hellowordapplication'){
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        // Run SonarQube analysis
-                        sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -X'  // Add -X for full debug logging
+                script {
+                    // Replace with your SonarQube server URL
+                    def scannerHome = tool 'SonarQube Scanner'
+                    withSonarQubeEnv(SONARQUBE_SERVER) { // Replace 'SonarQube' with your SonarQube server name
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project-key -Dsonar.host.url=http://your-sonarqube-server -Dsonar.login=${SONARQUBE_TOKEN}"
                     }
                 }
             }
@@ -39,17 +41,9 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    def qualityGateStatus
-                    try {
-                        // Poll the SonarQube server to check the quality gate status
-                        def response = sh(script: "curl -s -u ${SONARQUBE_TOKEN}: \"${SONARQUBE_SERVER}/api/qualitygates/project_status?projectKey=com.example:hellowordapplication\"", returnStdout: true).trim()
-                        def json = readJSON(text: response)
-                        qualityGateStatus = json.projectStatus.status
-                        if (qualityGateStatus != 'OK') {
-                            error "SonarQube Quality Gate failed: ${qualityGateStatus}"
-                        }
-                    } catch (Exception e) {
-                        error "Failed to check SonarQube Quality Gate status: ${e.getMessage()}"
+                    // Check the quality gate status
+                    timeout(time: 1, unit: 'HOURS') {
+                        waitForQualityGate abortPipeline: true
                     }
                 }
             }
@@ -67,4 +61,3 @@ pipeline {
         }
     }
 }
-
