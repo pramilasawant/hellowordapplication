@@ -3,7 +3,6 @@ pipeline {
     tools {
         maven 'maven'  // Use the correct Maven name from Jenkins Global Tool Configuration
         jdk 'JDK 17'   // Use the correct JDK name from Jenkins Global Tool Configuration
-        sonar 'SonarQube Scanner' // Add the SonarQube Scanner tool
     }
     environment {
         SONARQUBE_SERVER = 'SonarQube'  // This should match the name given during the SonarQube server configuration
@@ -29,10 +28,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Replace with your SonarQube server URL
-                    def scannerHome = tool 'SonarQube Scanner'
+                    // Use the SonarQube Scanner plugin's built-in environment
                     withSonarQubeEnv(SONARQUBE_SERVER) { // Replace 'SonarQube' with your SonarQube server name
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project-key -Dsonar.host.url=http://your-sonarqube-server -Dsonar.login=${SONARQUBE_TOKEN}"
+                        sh 'mvn sonar:sonar -Dsonar.login=${SONARQUBE_TOKEN} -Dsonar.host.url=http://your-sonarqube-server -Dsonar.projectKey=my-project-key'
                     }
                 }
             }
@@ -57,7 +55,4 @@ pipeline {
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
-            slackSend(channel: '#your-channel', color: 'danger', message: "Pipeline failed at stage: ${currentBuild.currentResult}")
-        }
-    }
-}
+            slackSend(channel: '#your-channel', color: '
