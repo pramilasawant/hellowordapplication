@@ -54,11 +54,9 @@ pipeline {
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
-            slackSend(channel: '#your-channel', color: 'good', message: "Pipeline succeeded: ${env.JOB_NAME} - ${env.BUILD_NUMBER}")
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
-            slackSend(channel: '#your-channel', color: 'danger', message: "Pipeline failed at stage: ${currentBuild.currentResult}")
         }
     }
 }
