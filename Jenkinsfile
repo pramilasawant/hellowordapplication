@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         maven 'maven'  // Ensure this matches the Maven name in Jenkins Global Tool Configuration
-        jdk 'JDK 17'         // Ensure this matches the JDK name in Jenkins Global Tool Configuration
+        jdk 'JDK 17'  // Ensure this matches the JDK name in Jenkins Global Tool Configuration
     }
     environment {
         SONARQUBE_SERVER = 'SonarQube'  // Ensure this matches the name given during SonarQube server configuration in Jenkins
@@ -25,7 +25,7 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
+        stage('SonarQube Analysis (Maven)') {
             steps {
                 dir('hellowordapplication') {
                     script {
@@ -37,7 +37,15 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
+        stage('SonarQube Analysis (Gradle)') {
+            steps {
+                withSonarQubeEnv(SONARQUBE_SERVER) {
+                    sh './gradlew sonarqube'
+                }
+            }
+        }
+
+        stage('Quality Gate (Maven)') {
             steps {
                 script {
                     timeout(time: 1, unit: 'HOURS') {
@@ -46,6 +54,14 @@ pipeline {
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
                     }
+                }
+            }
+        }
+
+        stage('Quality Gate (Gradle)') {
+            steps {
+                timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
