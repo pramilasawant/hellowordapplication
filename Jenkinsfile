@@ -25,7 +25,7 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis (Maven)') {
+        stage('SonarQube Analysis') {
             steps {
                 dir('hellowordapplication') {
                     script {
@@ -37,15 +37,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis (Gradle)') {
-            steps {
-                withSonarQubeEnv(SONARQUBE_SERVER) {
-                    sh './gradlew sonarqube'
-                }
-            }
-        }
-
-        stage('Quality Gate (Maven)') {
+        stage('Quality Gate') {
             steps {
                 script {
                     timeout(time: 1, unit: 'HOURS') {
@@ -54,14 +46,6 @@ pipeline {
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
                     }
-                }
-            }
-        }
-
-        stage('Quality Gate (Gradle)') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
                 }
             }
         }
