@@ -50,7 +50,7 @@ pipeline {
             }
         }
     }
-     
+    
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
