@@ -1,16 +1,15 @@
 pipeline {
     agent any
     tools {
-        maven 'maven'  // Ensure this matches the Maven name in Jenkins Global Tool Configuration
-        jdk 'JDK 17'  // Ensure this matches the JDK name in Jenkins Global Tool Configuration
-        // Ensure SonarQube Scanner is configured in Jenkins Global Tool Configuration
-        // scanner 'SonarQube Scanner'
+        maven 'maven'
+        jdk 'JDK 17'
+        scanner 'SonarQube Scanner'
     }
     environment {
-        SONARQUBE_SERVER = 'SonarQube'  // Ensure this matches the name given during SonarQube server configuration in Jenkins
-        SONARQUBE_TOKEN = credentials('sonar_token')  // Jenkins credentials ID for the SonarQube token
-        JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
+        SONARQUBE_SERVER = 'SonarQube'
+        SONARQUBE_TOKEN = credentials('sonar_token')
+        JAVA_HOME = "${tool 'JDK 17'}"
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
     stages {
         stage('Checkout') {
@@ -33,7 +32,7 @@ pipeline {
                     script {
                         def scannerHome = tool 'SonarQube Scanner'
                         withSonarQubeEnv(SONARQUBE_SERVER) {
-                            sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_TOKEN}"
+                            sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my_project_key -Dsonar.projectName=My_Project -Dsonar.projectVersion=1.0 -Dsonar.sources=src -Dsonar.host.url=http://your-sonarqube-server -Dsonar.login=${SONARQUBE_TOKEN}"
                         }
                     }
                 }
@@ -63,4 +62,3 @@ pipeline {
         }
     }
 }
-
