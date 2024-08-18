@@ -4,11 +4,9 @@ pipeline {
         maven 'maven'  // Ensure this matches the Maven name in Jenkins Global Tool Configuration
         jdk 'JDK 17'  // Ensure this matches the JDK name in Jenkins Global Tool Configuration
         // Ensure SonarQube Scanner is configured in Jenkins Global Tool Configuration
-        // scanner 'SonarQube Scanner'
     }
     environment {
         SONARQUBE_SERVER = 'SonarQube'  // Ensure this matches the name given during SonarQube server configuration in Jenkins
-        SONARQUBE_TOKEN = credentials('sonar_token')  // Jenkins credentials ID for the SonarQube token
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
     }
@@ -32,8 +30,10 @@ pipeline {
                 dir('hellowordapplication') {
                     script {
                         def scannerHome = tool 'SonarQube Scanner'
-                        withSonarQubeEnv(SONARQUBE_SERVER) {
-                            sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_TOKEN}"
+                        withCredentials([string(credentialsId: 'sonar_token', variable: 'SONARQUBE_TOKEN')]) {
+                            withSonarQubeEnv(SONARQUBE_SERVER) {
+                                sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_TOKEN}"
+                            }
                         }
                     }
                 }
