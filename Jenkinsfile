@@ -29,7 +29,7 @@ pipeline {
                 dir('hellowordapplication') {
                     script {
                         def scannerHome = tool 'SonarQube Scanner'
-                        withCredentials([string(credentialsId: 'squ_aadae9a5c495b87449d4d4a5356b62b6ac00734a', variable: 'sonar_id')]) {
+                        withCredentials([string(credentialsId: 'sonar_id', variable: 'sonar_id')]) {
                             withSonarQubeEnv(SONARQUBE_SERVER) {
                                 sh """${scannerHome}/bin/sonar-scanner \
                                     -Dsonar.projectKey=your_project_key \
