@@ -8,6 +8,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'
         JAVA_HOME = "${tool 'JDK 17'}"
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        SONARQUBR_TOKEN= 'sonar_token'
     }
     stages {
         stage('Checkout') {
