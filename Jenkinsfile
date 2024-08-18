@@ -1,14 +1,13 @@
 pipeline {
     agent any
     tools {
-        maven 'maven'  // Ensure this matches the Maven name in Jenkins Global Tool Configuration
-        jdk 'JDK 17'  // Ensure this matches the JDK name in Jenkins Global Tool Configuration
-        // Ensure SonarQube Scanner is configured in Jenkins Global Tool Configuration
+        maven 'maven'
+        jdk 'JDK 17'
     }
     environment {
-        SONARQUBE_SERVER = 'SonarQube'  // Ensure this matches the name given during SonarQube server configuration in Jenkins
-        JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
+        SONARQUBE_SERVER = 'SonarQube'
+        JAVA_HOME = "${tool 'JDK 17'}"
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
     stages {
         stage('Checkout') {
@@ -16,7 +15,7 @@ pipeline {
                 git url: 'https://github.com/pramilasawant/hellowordapplication.git', branch: 'main'
             }
         }
-        
+
         stage('Build') {
             steps {
                 dir('hellowordapplication') {
@@ -24,15 +23,16 @@ pipeline {
                 }
             }
         }
-        
+
         stage('SonarQube Analysis') {
             steps {
                 dir('hellowordapplication') {
                     script {
                         def scannerHome = tool 'SonarQube Scanner'
                         withCredentials([string(credentialsId: 'sonar_token', variable: 'SONARQUBE_TOKEN')]) {
+                            def token = SONARQUBE_TOKEN // Assign token to a variable
                             withSonarQubeEnv(SONARQUBE_SERVER) {
-                                sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_TOKEN}"
+                                sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${token}"
                             }
                         }
                     }
@@ -53,7 +53,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
