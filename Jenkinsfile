@@ -8,6 +8,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'  // Ensure this matches the name given during SonarQube server configuration in Jenkins
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
+        SONAR_HOST_URL = 'http://your-sonarqube-server'
     }
     stages {
         stage('Checkout') {
