@@ -29,15 +29,11 @@ pipeline {
             steps {
                 dir('hellowordapplication') {
                     script {
-                        def scannerHome = tool 'SonarQube Scanner'
-                        withCredentials([string(credentialsId: 'sonar_id', variable: 'sonar_id')]) {
-                            withSonarQubeEnv(SONARQUBE_SERVER) {
-                                sh """${scannerHome}/bin/sonar-scanner \
-                                    -Dsonar.projectKey=your_project_key \
-                                    -Dsonar.sources=. \
-                                    -Dsonar.host.url=${env.SONAR_HOST_URL} \
-                                    -Dsonar.login=${sonar_id}"""
-                            }
+                        mvn clean verify sonar:sonar \
+                         -Dsonar.projectKey=hellowordapplication \
+                         -Dsonar.host.url=http://localhost:9000 \
+                         -Dsonar.login=sqp_e416b2afb062e02b47abcac20f29bb6a77092f72
+                             }
                         }
                     }
                 }
