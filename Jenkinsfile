@@ -8,7 +8,7 @@ pipeline {
         SONARQUBE_SERVER = 'SonarQube'  // Ensure this matches the name given during SonarQube server configuration in Jenkins
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
-        SONAR_HOST_URL = 'http://your-sonarqube-server'
+        SONAR_HOST_URL = 'http://your-sonarqube-server'  // Replace with your actual SonarQube server URL
     }
     stages {
         stage('Checkout') {
@@ -29,12 +29,12 @@ pipeline {
             steps {
                 dir('hellowordapplication') {
                     script {
+                        sh """
                         mvn clean verify sonar:sonar \
-                         -Dsonar.projectKey=hellowordapplication \
-                         SONAR_HOST_URL = 'http://your-sonarqube-server'
-                         -Dsonar.login=sqp_e416b2afb062e02b47abcac20f29bb6a77092f72
-                             }
-                        }
+                            -Dsonar.projectKey=hellowordapplication \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=sqp_e416b2afb062e02b47abcac20f29bb6a77092f72
+                        """
                     }
                 }
             }
@@ -63,3 +63,4 @@ pipeline {
         }
     }
 }
+
