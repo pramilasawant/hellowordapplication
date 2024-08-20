@@ -31,7 +31,7 @@ pipeline {
                     script {
                         mvn clean verify sonar:sonar \
                          -Dsonar.projectKey=hellowordapplication \
-                         -Dsonar.host.url=http://localhost:9000 \
+                         SONAR_HOST_URL = 'http://your-sonarqube-server'
                          -Dsonar.login=sqp_e416b2afb062e02b47abcac20f29bb6a77092f72
                              }
                         }
