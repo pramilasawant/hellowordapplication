@@ -9,6 +9,7 @@ pipeline {
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
         SONAR_HOST_URL = 'http://localhost:9000'  // Replace with your actual SonarQube server URL
+        SONAR_LOGIN = 'sqp_e416b2afb062e02b47abcac20f29bb6a77092f72' // SonarQube token
     }
     stages {
         stage('Checkout') {
@@ -27,28 +28,32 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                dir('hellowordapplication') {
-                    script {
-                        sh """
-                        mvn clean verify sonar:sonar \
-                            -Dsonar.projectKey=hellowordapplication \
-                            -Dsonar.host.url=${SONAR_HOST_URL} \
-                            -Dsonar.login=sqp_e416b2afb062e02b47abcac20f29bb6a77092f72
-                        """
+                withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name of the SonarQube server configured in Jenkins
+                    dir('hellowordapplication') {
+                        script {
+                            sh """
+                            mvn clean verify sonar:sonar \
+                                -Dsonar.projectKey=hellowordapplication \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_LOGIN} \
+                                -X
+                            """
+                        }
                     }
                 }
             }
         }
 
-        // Wait for the SonarQube analysis to complete and check the Quality Gate status
         stage('Quality Gate') {
             steps {
                 script {
-                    // The pipeline will wait here until SonarQube has finished its analysis
                     timeout(time: 1, unit: 'HOURS') {
                         def qg = waitForQualityGate()  // Waits for the Quality Gate result from SonarQube
                         if (qg.status != 'OK') {
+                            echo "Quality Gate Status: ${qg.status}"
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        } else {
+                            echo "Quality Gate passed successfully: ${qg.status}"
                         }
                     }
                 }
@@ -62,6 +67,8 @@ pipeline {
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
+            slackSend(channel: 'Yes', message: "FAILURE")
         }
     }
 }
+
