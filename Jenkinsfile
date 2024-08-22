@@ -30,15 +30,13 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name of the SonarQube server configured in Jenkins
                     dir('hellowordapplication') {
-                        script {
-                            sh """
-                            mvn clean verify sonar:sonar \
-                                -Dsonar.projectKey=hellowordapplication \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_LOGIN} \
-                                -X
-                            """
-                        }
+                        sh """
+                        mvn clean verify sonar:sonar \
+                            -Dsonar.projectKey=hellowordapplication \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONAR_LOGIN} \
+                            -X
+                        """
                     }
                 }
             }
@@ -50,13 +48,11 @@ pipeline {
                     timeout(time: 1, unit: 'HOURS') {
                         def qg = waitForQualityGate()  // Waits for the Quality Gate result from SonarQube
                         if (qg.status != 'OK') {
-                            echo "Quality Gate Status: ${qg.status}"
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         } else {
                             echo "Quality Gate passed successfully: ${qg.status}"
                         }
                     }
-                    sh "mvn clean install"
                 }
             }
         }
@@ -65,11 +61,11 @@ pipeline {
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
+            slackSend(channel: '#Build', message: "SUCCESS: Build and SonarQube analysis succeeded.")
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
-            slackSend(channel: 'Yes', message: "FAILURE")
+            slackSend(channel: '#Build', message: "FAILURE: Build or SonarQube analysis failed.")
         }
     }
 }
-
