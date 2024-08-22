@@ -9,7 +9,7 @@ pipeline {
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
         SONAR_HOST_URL = 'http://localhost:9000'  // Replace with your actual SonarQube server URL
-        SONAR_LOGIN = 'sqp_e416b2afb062e02b47abcac20f29bb6a77092f72' // SonarQube token
+        SONAR_LOGIN = 'sqp_e416b2afb062e02b47abcac20f29bb6a77092f72'  // Retrieve SonarQube token from Jenkins credentials
     }
     stages {
         stage('Checkout') {
@@ -45,12 +45,28 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
+                    def retries = 5
+                    def waitTime = 30 // time in seconds
+
                     timeout(time: 1, unit: 'HOURS') {
-                        def qg = waitForQualityGate()  // Waits for the Quality Gate result from SonarQube
+                        for (int i = 0; i < retries; i++) {
+                            echo "Checking SonarQube task status (attempt ${i + 1}/${retries})..."
+                            def qg = waitForQualityGate()
+                            
+                            if (qg.status == 'OK') {
+                                echo "Quality Gate passed successfully: ${qg.status}"
+                                break
+                            } else if (qg.status == 'PENDING') {
+                                echo "SonarQube analysis is still in progress. Waiting..."
+                                sleep(time: waitTime, unit: 'SECONDS') // Wait before re-checking
+                            } else {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
+
+                        // If the loop ends without breaking, that means the task is still not completed
                         if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        } else {
-                            echo "Quality Gate passed successfully: ${qg.status}"
+                            error "Pipeline aborted due to quality gate failure after ${retries} attempts: ${qg.status}"
                         }
                     }
                 }
