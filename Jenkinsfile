@@ -42,30 +42,13 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
+       stage('Quality Gate') {
             steps {
                 script {
-                    def retries = 5
-                    def waitTime = 30 // time in seconds
-                    def qg
-                    for (int i = 0; i < retries; i++) {
-                        echo "Checking SonarQube task status (attempt ${i + 1}/${retries})..."
-                        qg = waitForQualityGate()
-                        
-                        if (qg.status == 'OK') {
-                            echo "Quality Gate passed successfully: ${qg.status}"
-                            break
-                        } else if (qg.status == 'PENDING') {
-                            echo "SonarQube analysis is still in progress. Waiting..."
-                            sleep(time: waitTime, unit: 'SECONDS') // Wait before re-checking
-                        } else {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        }
-                    }
-                    
-                    // If the loop ends without breaking, that means the task is still not completed
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure after ${retries} attempts: ${qg.status}"
+                    timeout(time: 5, unit: 'MINUTES') {
+                        def qualityGate = waitForQualityGate()
+                        if (qualityGate.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qualityGate.status}"
                     }
                 }
             }
