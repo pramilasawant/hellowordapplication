@@ -67,7 +67,7 @@ pipeline {
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
-            slackSend(channel: 'Yes', message: "FAILURE")
+            slackSend(channel: 'builds', message: "FAILURE")
         }
     }
 }
