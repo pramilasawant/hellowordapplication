@@ -64,6 +64,7 @@ pipeline {
     post {
         success {
             echo 'Build and SonarQube analysis succeeded.'
+            slackSend(channel: 'builds', message: "SUCCESS")
         }
         failure {
             echo 'Build or SonarQube analysis failed.'
