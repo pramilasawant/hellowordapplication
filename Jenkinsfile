@@ -47,12 +47,14 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    sleep(time: 20, unit: 'SECONDS') // Add delay to ensure SonarQube updates
+                    // Wait for SonarQube analysis to be completed
                     def qg = waitForQualityGate()
+                    
+                    // Check Quality Gate status
                     if (qg.status != 'OK') {
                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
                     } else {
-                        echo "Quality Gate passed: ${qg.status}"
+                        echo "Quality Gate passed successfully: ${qg.status}"
                     }
                 }
             }
