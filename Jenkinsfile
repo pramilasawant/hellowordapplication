@@ -48,7 +48,7 @@ pipeline {
                     def retries = 5
                     def waitTime = 30 // time in seconds
 
-                    timeout(time: 1, unit: 'HOURS') {
+                    timeout(time: 1, unit: 'MINUTE') {
                         for (int i = 0; i < retries; i++) {
                             echo "Checking SonarQube task status (attempt ${i + 1}/${retries})..."
                             def qg = waitForQualityGate()
