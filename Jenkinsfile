@@ -47,27 +47,25 @@ pipeline {
                 script {
                     def retries = 5
                     def waitTime = 30 // time in seconds
-
-                    timeout(time: 1, unit: 'MINUTE') {
-                        for (int i = 0; i < retries; i++) {
-                            echo "Checking SonarQube task status (attempt ${i + 1}/${retries})..."
-                            def qg = waitForQualityGate()
-                            
-                            if (qg.status == 'OK') {
-                                echo "Quality Gate passed successfully: ${qg.status}"
-                                break
-                            } else if (qg.status == 'PENDING') {
-                                echo "SonarQube analysis is still in progress. Waiting..."
-                                sleep(time: waitTime, unit: 'SECONDS') // Wait before re-checking
-                            } else {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
+                    def qg
+                    for (int i = 0; i < retries; i++) {
+                        echo "Checking SonarQube task status (attempt ${i + 1}/${retries})..."
+                        qg = waitForQualityGate()
+                        
+                        if (qg.status == 'OK') {
+                            echo "Quality Gate passed successfully: ${qg.status}"
+                            break
+                        } else if (qg.status == 'PENDING') {
+                            echo "SonarQube analysis is still in progress. Waiting..."
+                            sleep(time: waitTime, unit: 'SECONDS') // Wait before re-checking
+                        } else {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
-
-                        // If the loop ends without breaking, that means the task is still not completed
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure after ${retries} attempts: ${qg.status}"
-                        }
+                    }
+                    
+                    // If the loop ends without breaking, that means the task is still not completed
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure after ${retries} attempts: ${qg.status}"
                     }
                 }
             }
