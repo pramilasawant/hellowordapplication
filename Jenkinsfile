@@ -56,6 +56,7 @@ pipeline {
                             echo "Quality Gate passed successfully: ${qg.status}"
                         }
                     }
+                    sh "mvn clean install"
                 }
             }
         }
