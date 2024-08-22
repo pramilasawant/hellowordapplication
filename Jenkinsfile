@@ -28,6 +28,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                cleanWs() // Clean workspace to avoid caching issues
                 withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name of the SonarQube server configured in Jenkins
                     dir('hellowordapplication') {
                         sh """
