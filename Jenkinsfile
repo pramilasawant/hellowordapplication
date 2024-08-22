@@ -25,10 +25,16 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
+             steps {
+                withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name of the SonarQube server configured in Jenkins
                     dir('hellowordapplication') {
-                        sh 'mvn sonar:sonar -Dsonar.login=${SONAR_LOGIN}'
+                        sh """
+                        mvn clean verify sonar:sonar \
+                            -Dsonar.projectKey=hellowordapplication \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONAR_LOGIN} \
+                            -X
+                        """
                     }
                 }
             }
