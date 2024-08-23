@@ -9,7 +9,7 @@ pipeline {
         JAVA_HOME = "${tool 'JDK 17'}"  // Set JAVA_HOME to the correct JDK path
         PATH = "${JAVA_HOME}/bin:${env.PATH}"  // Add JAVA_HOME to the PATH
         SONAR_HOST_URL = 'http://localhost:9000'  // Replace with your actual SonarQube server URL
-        SONAR_LOGIN = 'sqp_e416b2afb062e02b47abcac20f29bb6a77092f72'  // Retrieve SonarQube token from Jenkins credentials
+        SONAR_LOGIN = 'sqp_e416b2afb062e02b47abcac20f29bb6a77092f72' // SonarQube token
     }
     stages {
         stage('Checkout') {
@@ -45,10 +45,12 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    timeout(time: 5, unit: 'MINUTES') {
-                        def qualityGate = waitForQualityGate()
-                        if (qualityGate.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qualityGate.status}"
+                    timeout(time: 1, unit: 'HOURS') {
+                        def qg = waitForQualityGate()  // Waits for the Quality Gate result from SonarQube
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        } else {
+                            echo "Quality Gate passed successfully: ${qg.status}"
                         }
                     }
                 }
@@ -67,3 +69,7 @@ pipeline {
         }
     }
 }
+
+
+
+
